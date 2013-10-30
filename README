@@ -1,6 +1,20 @@
-$FreeBSD: src/tools/regression/fstest/README,v 1.1 2007/01/28 00:10:28 pjd Exp $
+pjdfstest is a filesystem test suite that checks various system calls and
+POSIX conformance.
 
-Few notes on how to use fstest in short steps:
+This repository is a fork of Tuxera's fork of FreeBSD's pjdfstest.
+suite.
+
+Tuxera (of NTFS-3G fame) has a fork[1] of pjdfstest in which they added linux
+support and acl tests. it's based on a 2007 version of 'fstest' (renamed to
+pjdfstest in 2010) from FreeBSD[2].
+
+Since then, FreeBSD's pjdfstest seems to have added some BSD specific
+system calls, a very small number of ACL tests, mknod tests, and tests for
+fstat & ftruncate. I'm doing more work on Linux, so for now these changes are
+not yet included in this repository (though contributions are welcome).
+
+Installation:
+A few notes on how to use pjdfstest:
 
 	# cd fstest
 	# vi tests/conf
@@ -21,12 +35,14 @@ Currently supported operating systems: FreeBSD, Solaris, Linux.
 Currently supported file system types: UFS, ZFS, ext3, ext4, ntfs-3g,
                                        xfs, btrfs, glusterfs.
 
-Author: 
+Author:
 Pawel Jakub Dawidek <pjd@FreeBSD.org>
 
 Linux port:
 Jean-Pierre Andre <jean-pierre.andre@wanadoo.fr>
 Szabolcs Szakacsits <szaka@ntfs-3g.org>
-
 updates by:
 Zorro Lang <zlang@redhat.com>
+
+[1] http://sourceforge.net/p/ntfs-3g/pjd-fstest/ci/master/tree/
+[2] https://github.com/freebsd/freebsd/tree/9821af6a61ab5320a76df4994d7d5d45105d63ec/tools/regression/fstest
