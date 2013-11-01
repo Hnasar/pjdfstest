@@ -74,6 +74,6 @@ rm -rf ${d0}
 
 else
 rmdir ${n1}
-quick_exit
+quick_exit_not_ok "ACLs unavailable -- not running the tests"
 fi
 

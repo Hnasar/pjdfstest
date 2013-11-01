@@ -110,9 +110,24 @@ namegen()
 	echo "fstest_`dd if=/dev/urandom bs=1k count=1 2>/dev/null | md5sum  | cut -f1 -d' '`"
 }
 
-quick_exit()
+quick_exit_not_ok()
 {
 	echo "1..1"
+	if [ $# -eq 1 ]
+	then
+		echo $1
+	fi
+	echo "not ok 1"
+	exit 0
+}
+
+quick_exit_ok()
+{
+	echo "1..1"
+	if [ $# -eq 1 ]
+	then
+		echo $1
+	fi
 	echo "ok 1"
 	exit 0
 }
@@ -139,5 +154,5 @@ require()
 	if supported ${1}; then
 		return
 	fi
-	quick_exit
+	quick_exit_ok "$1 not supported"
 }

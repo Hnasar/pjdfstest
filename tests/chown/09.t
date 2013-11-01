@@ -32,6 +32,6 @@ FreeBSD:UFS)
 	expect 0 rmdir ${n0}
 	;;
 *)
-	quick_exit
+	quick_exit_ok
 	;;
 esac

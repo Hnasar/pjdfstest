@@ -18,6 +18,6 @@ FreeBSD)
 	expect 0 unlink ${n0}
 	;;
 *)
-	quick_exit
+	quick_exit_ok
 	;;
 esac
