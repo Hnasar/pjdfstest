@@ -45,6 +45,8 @@
 #ifdef HAS_ACL
 #include <sys/acl.h>
 #endif
+#include <sys/types.h>
+#include <attr/xattr.h>
 
 #ifndef HAS_TRUNCATE64
 #define	truncate64	truncate
@@ -88,6 +90,8 @@ enum action {
 	ACTION_GETFACL,
 	ACTION_SETFACL,
 #endif
+	ACTION_GETXATTR,
+	ACTION_SETXATTR,
 };
 
 #define	TYPE_NONE	0x0000
@@ -138,6 +142,8 @@ static struct syscall_desc syscalls[] = {
 	{ "setfacl", ACTION_SETFACL, { TYPE_STRING, TYPE_STRING,
 				 TYPE_STRING | TYPE_OPTIONAL, TYPE_NONE } },
 #endif
+	{ "getxattr", ACTION_GETXATTR, { TYPE_STRING, TYPE_STRING, TYPE_NONE } },
+	{ "setxattr", ACTION_SETXATTR, { TYPE_STRING, TYPE_STRING, TYPE_STRING | TYPE_OPTIONAL, TYPE_STRING | TYPE_OPTIONAL, TYPE_NONE } },
 	{ NULL, -1, { TYPE_NONE } }
 };
 
@@ -520,6 +526,44 @@ int do_setfacl(const char *path, const char *options, const char *textacl)
 
 #endif
 
+/*
+ *		Get the current setting of an xattr
+ *
+ *	Argument may be :
+ *	- access : to get the list of permissions in access control list
+ *	- default : to get the list of permissions in default control list
+ */
+
+int do_getxattr(const char *path, const char *filter)
+//(const char *path, const char *filter)
+{
+	printf("foo");
+	return 0;
+}
+
+/*
+ *		Set a new xattr
+ *
+ *      The options is a string of one character either:
+ *      c (for create; return EEXIST if attribute exists already)
+ *      r (for replace; return ENOATTR if attribute doesn't already exist).
+ */
+
+int do_setxattr(const char *path, const char *name, void *value,
+		const char *options)
+{
+	int size = strlen(value);
+	int flags = 0;
+	if (options) {
+		flags = (strcmp(options, "c") == 0) ? XATTR_CREATE : flags;
+		flags = (strcmp(options, "r") == 0) ? XATTR_REPLACE : flags;
+	}
+	if (setxattr(path, name, value, size, flags) == -1) {
+		return -errno;
+	}
+	return 0;
+}
+
 static unsigned int
 call_syscall(struct syscall_desc *scall, int argc, char *argv[])
 {
@@ -688,6 +732,14 @@ call_syscall(struct syscall_desc *scall, int argc, char *argv[])
 		rval = do_setfacl(STR(0), STR(1), STR(2));
 		break;
 #endif
+	case ACTION_GETXATTR :
+		rval = do_getxattr(STR(0), STR(1));
+		if (rval == 0)
+			return (i);
+		break;
+	case ACTION_SETXATTR :
+		rval = do_setxattr(STR(0), STR(1), STR(2), STR(3));
+		break;
 	default:
 		fprintf(stderr, "unsupported syscall\n");
 		exit(1);
