@@ -5,7 +5,7 @@ This repository is a fork of Tuxera's fork of FreeBSD's pjdfstest.
 suite.
 
 Tuxera (of NTFS-3G fame) has a fork[1] of pjdfstest in which they added linux
-support and acl tests. it's based on a 2007 version of 'fstest' (renamed to
+support and acl tests. It's based on a 2007 version of 'fstest' (renamed to
 pjdfstest in 2010) from FreeBSD[2].
 
 Since then, FreeBSD's pjdfstest seems to have added some BSD specific
@@ -16,18 +16,18 @@ not yet included in this repository (though contributions are welcome).
 Installation:
 A few notes on how to use pjdfstest:
 
-	# cd fstest
-	# vi tests/conf
+	$ cd fstest
+	$ vi tests/conf
 	Change 'fs' to file system type you want to test. These can be:
 	UFS, ZFS, ext3, ext4, ntfs-3g, xfs, btrfs, glusterfs.
-	# vi Makefile
+	$ vi Makefile
 	You may need to manually tweak few things by editing CFLAGS lines
 	at the top of the file.
-	# make
+	$ make
 	It will compile fstest utility which is used by regression tests.
-	# cd /path/to/file/system/you/want/to/test/
+	$ cd /path/to/file/system/you/want/to/test/
 	The test must be run as root user.
-	# prove -r /path/to/fstest/
+	$ sudo prove -r /path/to/fstest/
 
 That's all. Enjoy.
 
