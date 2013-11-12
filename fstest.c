@@ -519,7 +519,7 @@ int do_setfacl(const char *path, const char *options, const char *textacl)
 #endif
 
 static unsigned int
-call_syscall(struct syscall_desc *scall, char *argv[])
+call_syscall(struct syscall_desc *scall, int argc, char *argv[])
 {
 	struct stat64 sb;
 	struct utimbuf ut;
@@ -537,12 +537,13 @@ call_syscall(struct syscall_desc *scall, char *argv[])
 	 */
 	for (i = 0; i < sizeof(args)/sizeof(args[0]); i++) {
 		if (scall->sd_args[i] == TYPE_NONE) {
-			if (argv[i] == NULL || strcmp(argv[i], ":") == 0)
+			if (i >= argc || argv[i] == NULL || strcmp(argv[i], ":") == 0)
 				break;
 			fprintf(stderr, "too many arguments [%s]\n", argv[i]);
 			exit(1);
 		} else {
-			if (argv[i] == NULL || strcmp(argv[i], ":") == 0) {
+			if (i >= argc || argv[i] == NULL ||
+					strcmp(argv[i], ":") == 0) {
 				if (scall->sd_args[i] & TYPE_OPTIONAL) {
 					args[i].str = NULL;
 					break;
@@ -794,20 +795,20 @@ main(int argc, char *argv[])
 	/* Change umask to requested value or to 0, if not requested. */
 	umask(umsk);
 
-	for (;;) {
+	while (argc > 0) {
 		scall = find_syscall(argv[0]);
 		if (scall == NULL) {
 			fprintf(stderr, "syscall '%s' not supported\n", argv[0]);
 			exit(1);
 		}
-		argc++;
+		argc--;
 		argv++;
-		n = call_syscall(scall, argv);
-		argc += n;
+		n = call_syscall(scall, argc, argv);
+		argc -= n;
 		argv += n;
 		if (argv[0] == NULL)
 			break;
-		argc++;
+		argc--;
 		argv++;
 	}
 
