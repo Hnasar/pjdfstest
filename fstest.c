@@ -96,6 +96,8 @@ enum action {
 
 #define	TYPE_OPTIONAL	0x0100
 
+#define OPTIONAL_NUMBER_SENTINEL	-1
+
 #define	MAX_ARGS	8
 
 struct syscall_desc {
@@ -545,8 +547,13 @@ call_syscall(struct syscall_desc *scall, int argc, char *argv[])
 			if (i >= argc || argv[i] == NULL ||
 					strcmp(argv[i], ":") == 0) {
 				if (scall->sd_args[i] & TYPE_OPTIONAL) {
-					args[i].str = NULL;
-					break;
+					if (scall->sd_args[i] & TYPE_STRING) {
+						args[i].str = NULL;
+					}
+					if (scall->sd_args[i] & TYPE_NUMBER) {
+						args[i].num = OPTIONAL_NUMBER_SENTINEL;
+					}
+					continue;
 				}
 				fprintf(stderr, "too few arguments\n");
 				exit(1);
@@ -576,13 +583,13 @@ call_syscall(struct syscall_desc *scall, int argc, char *argv[])
 	case ACTION_OPEN:
 		flags = str2flags(open_flags, STR(1));
 		if (flags & O_CREAT) {
-			if (i == 2) {
+			if (NUM(2) == OPTIONAL_NUMBER_SENTINEL) {
 				fprintf(stderr, "too few arguments\n");
 				exit(1);
 			}
 			rval = open(STR(0), flags, (mode_t)NUM(2));
 		} else {
-			if (i == 3) {
+			if (NUM(2) != OPTIONAL_NUMBER_SENTINEL) {
 				fprintf(stderr, "too many arguments\n");
 				exit(1);
 			}
