@@ -534,10 +534,26 @@ int do_setfacl(const char *path, const char *options, const char *textacl)
  *	- default : to get the list of permissions in default control list
  */
 
-int do_getxattr(const char *path, const char *filter)
-//(const char *path, const char *filter)
+int do_getxattr(const char *path, const char *name)
 {
-	printf("foo");
+	int size = 1024;
+	int count = 0;
+	int vsize;
+	unsigned char *value = malloc(size);
+	if ((vsize = getxattr(path, name, value, size)) == -1) {
+		if (errno == ERANGE && count < 10) { // less than 1MB
+			size *= 2;
+			count++;
+			free(value);
+			value = malloc(size);
+		}
+		else {
+			return -errno;
+		}
+	}
+	int i;
+	for (i = 0; i < vsize; i++)
+		putchar(value[i]);
 	return 0;
 }
 
